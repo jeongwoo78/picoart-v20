@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // CORS 헤더
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
@@ -15,15 +14,12 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { image, prompt, style } = req.body;
+    const { image, prompt } = req.body;
 
     if (!image || !prompt) {
       return res.status(400).json({ error: 'Missing image or prompt' });
     }
 
-    // XLabs FLUX Depth ControlNet API 호출
-    // v16: 검증된 안정적인 모델 (259.5K+ runs)
-    // 비용: $0.074/장, 처리시간: ~54초
     const response = await fetch('https://api.replicate.com/v1/predictions', {
       method: 'POST',
       headers: {
@@ -31,15 +27,14 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        // XLabs-AI flux-dev-controlnet v3 (Depth, Canny, Soft Edge)
         version: "f2c31c31d81278a91b2447a304dae654c64a5d5a70340fba811bb1cbd41019a2",
         input: {
           prompt: prompt,
           control_image: image,
-          control_type: "depth", // 깊이 정보 기반 컨트롤 (구도 유지 최적)
-          control_strength: 0.5, // 0.3-0.7 권장 (낮을수록 원본 유지, 높을수록 화풍 강조)
-          steps: 28, // 추론 단계 (20-50)
-          guidance_scale: 3.5, // 프롬프트 충실도 (2.0-5.0)
+          control_type: "depth",
+          control_strength: 0.3,  // 원본 더 유지 (0.5 → 0.3)
+          steps: 28,
+          guidance_scale: 3.5,
           output_format: "jpg",
           output_quality: 90
         }
