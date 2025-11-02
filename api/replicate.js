@@ -32,7 +32,7 @@ export default async function handler(req, res) {
           prompt: prompt,
           control_image: image,
           control_type: "depth",
-          control_strength: 0.3,  // 원본 더 유지 (0.5 → 0.3)
+          control_strength: 0.1,  // 극단적으로 낮춤 (0.3 → 0.1)
           steps: 28,
           guidance_scale: 3.5,
           output_format: "jpg",
